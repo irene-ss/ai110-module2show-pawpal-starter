@@ -1,6 +1,6 @@
 import streamlit as st
 
-from pawpal_system import Owner, Pet, PriorityLevel, Scheduler
+from pawpal_system import Owner, Pet, PriorityLevel, Scheduler, TaskStatus
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
 
@@ -84,18 +84,35 @@ if st.button("Add task"):
 
 all_tasks = owner.get_all_tasks()
 if all_tasks:
-    st.write("Current tasks:")
+    scheduler = Scheduler()
+    include_completed = st.checkbox("Include completed tasks in schedule view", value=False)
+    visible_tasks = scheduler.filter_tasks(
+        all_tasks,
+        status=None if include_completed else TaskStatus.PENDING,
+    )
+    chronological_tasks = scheduler.sort_by_time(visible_tasks)
+
+    st.write("Current tasks (sorted by time):")
     task_rows = [
         {
             "title": task.title,
-            "pet": pet.name if (pet := next((p for p in owner.pets if p.pet_id == task.pet_id), None)) else "Unknown",
+            "pet": next((p.name for p in owner.pets if p.pet_id == task.pet_id), "Unknown"),
+            "time": task.scheduled_time.strftime("%H:%M") if task.scheduled_time else "Not set",
             "duration": task.duration,
             "priority": task.priority_level.value,
             "status": task.status.value,
         }
-        for task in all_tasks
+        for task in chronological_tasks
     ]
     st.table(task_rows)
+
+    conflicts = scheduler.detect_conflicts(chronological_tasks)
+    if conflicts:
+        st.warning("Possible scheduling conflicts detected:")
+        for conflict in conflicts:
+            st.write(f"- {conflict}")
+    else:
+        st.success("No overlapping tasks detected for the visible schedule.")
 else:
     st.info("No tasks yet. Add one above.")
 
@@ -106,7 +123,7 @@ st.caption("This button should call your scheduling logic once you implement it.
 
 if st.button("Generate schedule"):
     scheduler = Scheduler()
-    organized_tasks = scheduler.organize_tasks(owner)
+    organized_tasks = scheduler.organize_tasks(owner, include_completed=False)
     if organized_tasks:
         st.success("Schedule generated successfully.")
         st.table(
@@ -121,5 +138,12 @@ if st.button("Generate schedule"):
                 for task in organized_tasks
             ]
         )
+
+        conflicts = scheduler.detect_conflicts(organized_tasks)
+        if conflicts:
+            for conflict in conflicts:
+                st.warning(conflict)
+        else:
+            st.success("The generated schedule has no overlapping tasks.")
     else:
         st.info("No tasks available to schedule yet.")

@@ -43,10 +43,15 @@ One tradeoff is that the scheduler currently checks for conflicts by looking for
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
 - What kinds of prompts or questions were most helpful?
 
+I used AI to brainstorm class responsibilities and identify missing scheduler behaviors.
+AI was also used to get concrete examples of task sorting, conflict detection, and recurrence logic
+
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
 - How did you evaluate or verify what the AI suggested?
+
+I did not accept an AI suggestion to make conflict detection based on full duration overlap. I verified it by comparing the suggestion to the current project scope and chose exact-time overlap as a simpler, more appropriate tradeoff.
 
 ---
 
@@ -57,10 +62,14 @@ One tradeoff is that the scheduler currently checks for conflicts by looking for
 - What behaviors did you test?
 - Why were these tests important?
 
+Tested task completion status, task ordering by time/priority, and whether duplicate-time warnings appear. These tests are important because they ensure the app produces a usable schedule and catches obvious scheduling issues.
+
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
 - What edge cases would you test next if you had more time?
+
+I gave it 4.5 stars as i am fairly confident that it works. Next edge cases to test would be tasks without scheduled times and same-time tasks with different priorities.
 
 ---
 
@@ -70,10 +79,16 @@ One tradeoff is that the scheduler currently checks for conflicts by looking for
 
 - What part of this project are you most satisfied with?
 
+I was most satisfied with the integration of multiple phases and code files into 1 working app. I enjoyed the variety is tasks completed to reach final goal.
+
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
 
+I would improve the scheduler by handling full-duration overlap detection rather than only exact-time conflicts.
+
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+
+One important lesson is that using AI is most effective when I verify suggestions against the actual code and project goals. This also hiighlighted the importance of testing especially when integrating AI chatbots when coding.
