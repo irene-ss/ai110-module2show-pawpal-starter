@@ -7,6 +7,8 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+Classes included would be owner name, pet name and tasks. An owner should be able to add a pet and then allot tasks for the pet with details such as priority and duration.Prompt for mermaid.js: " create a Mermaid.js class diagram for a pet care app I am designing. It includes classes such as owner, pet, tasks. The task class comes with attributes such as duration, priority levels, owner preferences and constraints."
+
 **b. Design changes**
 
 - Did your design change during implementation?

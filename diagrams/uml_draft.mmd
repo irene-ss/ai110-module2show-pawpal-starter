@@ -1,0 +1,43 @@
+classDiagram
+    class Owner {
+        +String ownerId
+        +String name
+        +String email
+        +String phone
+        +List~Pet~ pets
+        +createTask()
+        +viewSchedule()
+    }
+
+    class Pet {
+        +String petId
+        +String name
+        +String breed/species
+        +int age
+        +List~Task~ tasks
+        +addTask()
+        +updateProfile()
+    }
+
+    class Task {
+        +String taskId
+        +String title
+        +int duration
+        +PriorityLevel priorityLevel
+        +String ownerPreferences
+        +String constraints
+        +Date scheduledTime
+        +completeTask()
+    }
+
+    class PriorityLevel {
+        <<enumeration>>
+        LOW
+        MEDIUM
+        HIGH
+    }
+
+    Owner "1" --> "0..*" Pet : owns
+    Owner "1" --> "0..*" Task : creates
+    Pet "1" --> "0..*" Task : has
+    Task --> PriorityLevel : uses
