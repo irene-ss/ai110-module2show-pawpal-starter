@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import List, Optional
 
@@ -43,6 +43,36 @@ class Task:
     def mark_complete(self) -> None:
         """Mark the task as completed."""
         self.status = TaskStatus.COMPLETED
+
+    def create_next_occurrence(self, pet: Optional[Pet] = None, owner: Optional[Owner] = None) -> Optional["Task"]:
+        """Create the next occurrence of a recurring task."""
+        if self.frequency not in {"daily", "weekly"}:
+            return None
+
+        if self.scheduled_time is None:
+            return None
+
+        delta = timedelta(days=1) if self.frequency == "daily" else timedelta(days=7)
+        next_scheduled_time = self.scheduled_time + delta
+
+        if pet is None or owner is None:
+            return None
+
+        next_task = Task(
+            task_id=f"{owner.owner_id}-{pet.pet_id}-{len(pet.tasks) + 1}",
+            title=self.title,
+            description=self.description,
+            duration=self.duration,
+            scheduled_time=next_scheduled_time,
+            frequency=self.frequency,
+            priority_level=self.priority_level,
+            owner_preferences=self.owner_preferences,
+            constraints=self.constraints,
+            pet_id=pet.pet_id,
+            owner_id=owner.owner_id,
+        )
+        pet.add_task(next_task)
+        return next_task
 
     def is_completed(self) -> bool:
         """Return whether the task has been completed."""
@@ -188,13 +218,50 @@ class Scheduler:
             ),
         )
 
+    def sort_by_time(self, tasks: List[Task]) -> List[Task]:
+        """Sort tasks by scheduled time for a simple daily view."""
+        return sorted(tasks, key=lambda task: (task.scheduled_time or datetime.max, task.title.lower()))
+
+    def filter_tasks(self, tasks: List[Task], *, status: Optional[TaskStatus] = None, pet_name: Optional[str] = None, owner: Optional[Owner] = None) -> List[Task]:
+        """Filter tasks by completion status or pet name."""
+        filtered_tasks = list(tasks)
+        if status is not None:
+            filtered_tasks = [task for task in filtered_tasks if task.status == status]
+        if pet_name is not None:
+            filtered_tasks = [
+                task for task in filtered_tasks
+                if self._pet_name_for_task(task, owner) == pet_name
+            ]
+        return filtered_tasks
+
     def mark_task_complete(self, owner: Owner, task_id: str) -> bool:
         """Mark a task complete if it exists in the owner's schedule."""
         for task in self.retrieve_tasks(owner):
             if task.task_id == task_id:
                 task.mark_complete()
+                if task.frequency in {"daily", "weekly"}:
+                    pet = next((pet for pet in owner.pets if pet.pet_id == task.pet_id), None)
+                    task.create_next_occurrence(pet=pet, owner=owner)
                 return True
         return False
+
+    def detect_conflicts(self, tasks: List[Task]) -> List[str]:
+        """Return lightweight warnings for overlapping scheduled tasks."""
+        grouped_tasks: dict[datetime, List[Task]] = {}
+        for task in tasks:
+            if task.scheduled_time is None:
+                continue
+            grouped_tasks.setdefault(task.scheduled_time, []).append(task)
+
+        warnings: List[str] = []
+        for scheduled_time, grouped in grouped_tasks.items():
+            if len(grouped) > 1:
+                conflict_tasks = ", ".join(task.title for task in grouped)
+                warnings.append(
+                    f"Warning: tasks {conflict_tasks} overlap at {scheduled_time.strftime('%H:%M')}."
+                )
+
+        return warnings
 
     def _priority_rank(self, priority_level: PriorityLevel) -> int:
         ranking = {
@@ -203,3 +270,12 @@ class Scheduler:
             PriorityLevel.LOW: 2,
         }
         return ranking[priority_level]
+
+    def _pet_name_for_task(self, task: Task, owner: Optional[Owner]) -> str:
+        """Return the pet name for a task when available."""
+        if owner is None:
+            return "Unknown"
+        for pet in owner.pets:
+            if pet.pet_id == task.pet_id:
+                return pet.name
+        return "Unknown"

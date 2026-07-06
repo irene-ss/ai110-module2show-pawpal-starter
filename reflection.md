@@ -25,10 +25,14 @@ The AI feedback did point out some disparities so the updated design became slig
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
 - How did you decide which constraints mattered most?
 
+The scheduler considers time, task priority, and task completion status. It uses scheduled_time to order tasks, priority_level to decide which tasks should appear earlier in the plan, and status to filter out completed tasks from the active schedule. I treated time and priority as the most important constraints because they directly affect whether a schedule is practical and helpful for the owner. Owner preferences and constraints were also included in the task model, but the current scheduler focuses mainly on the core scheduling signals that are easiest to validate in this version.
+
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
+
+One tradeoff is that the scheduler currently checks for conflicts by looking for tasks scheduled at the exact same time, rather than detecting full overlap based on duration. This is reasonable for this project because the scheduler is lightweight and intended to provide simple warnings, not a full calendar engine. Focusing on exact time matches keeps the logic easier to understand and faster to run while still catching the most obvious scheduling conflicts.
 
 ---
 
