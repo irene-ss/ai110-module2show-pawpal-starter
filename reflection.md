@@ -7,12 +7,14 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
-Classes included would be owner name, pet name and tasks. An owner should be able to add a pet and then allot tasks for the pet with details such as priority and duration.Prompt for mermaid.js: " create a Mermaid.js class diagram for a pet care app I am designing. It includes classes such as owner, pet, tasks. The task class comes with attributes such as duration, priority levels, owner preferences and constraints."
+My initial UML design focused on a simple pet care system with three main classes: Owner, Pet, and Task. The Owner class represents the person managing the pet care routine and is responsible for creating tasks and viewing the schedule. The Pet class represents an individual animal and is responsible for storing basic profile information and holding the tasks assigned to that pet. The Task class represents a specific care activity, such as feeding or walking, and stores details like duration, priority level, owner preferences, and constraints. I also included a PriorityLevel enum to represent task urgency. The overall design was meant to show how an owner can manage multiple pets and assign care tasks to each one in a structured way.
 
 **b. Design changes**
 
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
+
+The AI feedback did point out some disparities so the updated design became slightly more structured during implementation. I added a TaskStatus enum so each task could clearly track whether it was still pending or completed, which made the task lifecycle easier to represent. This change was useful because it made the skeleton more realistic and reduced the chance of logic issues when creating or viewing tasks.
 
 ---
 
