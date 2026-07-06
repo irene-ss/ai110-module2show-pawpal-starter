@@ -63,19 +63,25 @@ Today's Schedule
 
 ## 🧪 Testing PawPal+
 
+Run the test suite with:
+
 ```bash
-# Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+python -m pytest
 ```
 
-Sample test output:
+The tests cover the core scheduler behaviors for PawPal+, including sorting tasks in chronological order, confirming that completing a daily task creates the next day's occurrence, and detecting conflicts when multiple tasks share the same scheduled time.
 
-```
-# Paste your pytest output here
-```
+TESTING OUTPUT:
+=============== test session starts ================
+platform win32 -- Python 3.14.5, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\Users\rekha\OneDrive\Desktop\CodePath\AI 101\week 5 proj2\ai110-module2show-pawpal-starter
+plugins: anyio-4.14.0
+collected 6 items                                   
+
+tests\test_pawpal.py ......                   [100%]
+
+================ 6 passed in 0.05s =================
+SYSTEM RELIABILITY: 4.5 stars
 
 ## 📐 Smarter Scheduling
 
